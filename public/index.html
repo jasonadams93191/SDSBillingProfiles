@@ -805,7 +805,7 @@ function renderClients(){
     const q=(document.getElementById('cS')?.value||'').toLowerCase();
     const f=document.getElementById('cF')?.value||'all';
     let h='',shown=0;
-    for(const c of CL){
+    for(const c of [...CL].sort((a,b)=>{const da=CD[a]||'',db=CD[b]||'';if(da&&!db)return-1;if(!da&&db)return 1;return a.localeCompare(b);})){
         const def=CD[c]||'';
         const mc=M.filter(m=>m.c===c).length;
         // Effective carriers for this client
@@ -849,8 +849,8 @@ function renderMatters(){
     const indices=[...Array(M.length).keys()];
     indices.sort((a,b)=>{
         const ea=eff(a),eb=eff(b);
-        if(!ea&&eb)return-1;if(ea&&!eb)return 1;
-        return M[a].c.localeCompare(M[b].c)||M[a].n.localeCompare(M[b].n);
+        if(ea&&!eb)return-1;if(!ea&&eb)return 1;
+        return (ea||'ZZZ').localeCompare(eb||'ZZZ')||M[a].c.localeCompare(M[b].c);
     });
     
     for(const i of indices){
@@ -947,4 +947,6 @@ function xCSV(){
     const b=new Blob([csv],{type:'text/csv'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='SDS_'+new Date().toISOString().slice(0,10)+'.csv';a.click();
 }
 window.onbeforeunload=()=>dirty?'Unsaved changes':null;
+// Pre-render both tabs on load
+renderClients();renderMatters();
 </script></body></html>
