@@ -100,25 +100,91 @@ setTimeout(()=>{const b=document.getElementById('userBadge');if(b&&loggedUser){b
 <div class="tb" data-t="vendors">📦 Vendors</div>
 </div>
 <div class="pn on" id="p-instructions">
-<div style="max-width:700px;margin:0 auto">
-<div style="background:#fff;border-radius:10px;box-shadow:0 2px 12px rgba(0,0,0,.08);padding:20px 24px;margin-bottom:14px;border-left:5px solid #1956A6">
-<h2 style="color:#0D3B6E;font-size:16px;margin:0 0 10px">SDS Billing Profiles</h2>
-<p style="font-size:12px;line-height:1.7;margin:0">This workbook maps every active matter to its insurance carrier billing profile. Your edits here will be imported into CaseCloud.</p>
-</div>
-<div style="background:#fff;border-radius:10px;box-shadow:0 2px 12px rgba(0,0,0,.08);padding:20px 24px;margin-bottom:14px">
-<h3 style="color:#0D3B6E;font-size:13px;margin:0 0 10px">What to do</h3>
-<p style="font-size:12px;line-height:1.8;margin:0 0 4px"><b>1.</b> <b>Clients tab</b> &mdash; Filter &ldquo;Has Unassigned&rdquo; and set default carriers to clear the 79 unassigned matters.</p>
-<p style="font-size:12px;line-height:1.8;margin:0 0 4px"><b>2.</b> <b>Matters tab</b> &mdash; For mixed clients (like City of New York), override individual matters.</p>
-<p style="font-size:12px;line-height:1.8;margin:0 0 4px"><b>3.</b> <b>Billing Profiles tab</b> &mdash; Fill in rates, banned phrases, and rules you have on file.</p>
-<p style="font-size:12px;line-height:1.8;margin:0"><b>4.</b> Hit <b>Save</b> at the bottom when done.</p>
-</div>
-<div style="background:#e8f4fd;border:2px solid #1956A6;border-radius:10px;padding:12px 16px;margin-bottom:14px">
-<p style="font-size:11px;font-weight:700;color:#0D3B6E;margin:0 0 4px;font-family:'JetBrains Mono',monospace">Carrier = Override &rarr; Matter Carrier &rarr; Client Default &rarr; UNASSIGNED</p>
-<p style="font-size:10px;color:#0D3B6E;margin:0">Setting a client default automatically applies to all its matters that don&rsquo;t already have one.</p>
-</div>
-<p style="font-size:10px;color:#8B8E91;text-align:center">Questions? Contact jason@advocatecloudsolutions.com</p>
+<div style="max-width:800px;margin:0 auto">
+
+<div class="cd" style="border-left:5px solid #1956A6;margin-bottom:16px">
+<div style="padding:16px 20px">
+<h2 style="color:#0D3B6E;font-size:18px;margin:0 0 4px">Welcome to the SDS Billing Profiles Workbook</h2>
+<p style="color:#8B8E91;font-size:12px;margin:0">Prepared by <b style="color:#0D3B6E">Advocate Cloud Solutions</b> for Strikowsky Drachman &amp; Shapiro PLLC</p>
 </div>
 </div>
+
+<div class="cd" style="margin-bottom:16px">
+<div style="padding:16px 20px">
+<h3 style="color:#0D3B6E;font-size:14px;margin:0 0 8px">What This Workbook Does</h3>
+<p style="font-size:12px;line-height:1.7;margin:0 0 8px">This workbook maps every active SDS matter to its <b>insurance carrier billing profile</b>. It ensures that time entries, expenses, and invoices for each matter follow the correct carrier&rsquo;s outside counsel guidelines (OCG). The goal is to have <b>every matter assigned to a carrier profile</b> so billing compliance is automated in CaseCloud.</p>
+<p style="font-size:12px;line-height:1.7;margin:0;color:#1956A6;font-weight:700">Your edits here will be imported directly into CaseCloud &mdash; accuracy matters.</p>
+</div>
+</div>
+
+<div class="cd" style="margin-bottom:16px">
+<div style="padding:16px 20px">
+<h3 style="color:#0D3B6E;font-size:14px;margin:0 0 10px">Tab Guide</h3>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:6px">
+<div style="background:#f7f8fa;border-radius:8px;padding:10px 12px">
+<p style="font-size:12px;font-weight:700;color:#0D3B6E;margin:0 0 4px">&#x1F3E2; Billing Profiles</p>
+<p style="font-size:11px;line-height:1.6;margin:0">The 23 carrier billing profiles. Each card shows the carrier&rsquo;s <b>platform</b>, <b>rates</b>, <b>banned phrases</b>, <b>narrative rules</b>, <b>travel policy</b>, <b>non-billable items</b>, and <b>invoice rules</b>. Click a card to expand it. You can <b>edit every field</b> &mdash; add/remove items using the + and &times; buttons.</p>
+</div>
+<div style="background:#f7f8fa;border-radius:8px;padding:10px 12px">
+<p style="font-size:12px;font-weight:700;color:#0D3B6E;margin:0 0 4px">&#x1F464; Clients</p>
+<p style="font-size:11px;line-height:1.6;margin:0">All 48 SDS clients. Each row shows how many matters are assigned vs. unassigned. Use the <b>&ldquo;Set Default&rdquo; dropdown</b> to assign a carrier to all of a client&rsquo;s matters at once. This is the fastest way to clear unassigned matters.</p>
+</div>
+<div style="background:#f7f8fa;border-radius:8px;padding:10px 12px">
+<p style="font-size:12px;font-weight:700;color:#0D3B6E;margin:0 0 4px">&#x1F4C2; Matters</p>
+<p style="font-size:11px;line-height:1.6;margin:0">All 586 active matters. Each row shows the <b>effective carrier</b> and its <b>source</b> (matter-level, account-level, or override). Use the <b>&ldquo;Override&rdquo; dropdown</b> on any row to assign or change a specific matter&rsquo;s carrier.</p>
+</div>
+<div style="background:#f7f8fa;border-radius:8px;padding:10px 12px">
+<p style="font-size:12px;font-weight:700;color:#0D3B6E;margin:0 0 4px">&#x1F4E6; Vendors</p>
+<p style="font-size:11px;line-height:1.6;margin:0">Records retrieval vendors and their rules. <b>Lexitas</b> (Hanover) and <b>Choice Legal / Ontellus</b> bill carriers directly &mdash; SDS does NOT pay these.</p>
+</div>
+</div>
+</div>
+</div>
+
+<div class="cd" style="border-left:5px solid #ff6b6b;margin-bottom:16px">
+<div style="padding:16px 20px">
+<h3 style="color:#ff6b6b;font-size:14px;margin:0 0 10px">What We Need From You</h3>
+<div style="font-size:12px;line-height:1.8">
+<p style="margin:0 0 6px"><b style="color:#0D3B6E">1. Assign carriers to the 79 unassigned matters.</b><br>
+Go to the <b>Clients</b> tab and filter by &ldquo;Has Unassigned.&rdquo; For clients where every matter goes to the same carrier, set the default. For mixed clients like <b>City of New York, The</b>, go to the <b>Matters</b> tab and override individual matters.</p>
+<p style="margin:0 0 6px"><b style="color:#0D3B6E">2. Fill in rates on all 23 carrier profiles.</b><br>
+Go to <b>Billing Profiles</b>, expand each carrier, and enter partner/associate/paralegal hourly rates.</p>
+<p style="margin:0 0 6px"><b style="color:#0D3B6E">3. Review and complete missing profile rules.</b><br>
+Some profiles (like Prime Insurance, AXA XL, Eastern Dentists) are mostly empty. Add banned phrases, narrative rules, travel policies, and invoice rules as you have them.</p>
+<p style="margin:0"><b style="color:#0D3B6E">4. Save when done.</b><br>
+Click <b>Save</b> at the bottom. Your changes are saved to the browser.</p>
+</div>
+</div>
+</div>
+
+<div class="cd" style="margin-bottom:16px">
+<div style="padding:16px 20px">
+<h3 style="color:#0D3B6E;font-size:14px;margin:0 0 8px">How the Carrier Formula Works</h3>
+<div style="background:#e8f4fd;border:2px solid #1956A6;border-radius:8px;padding:10px 14px;margin-bottom:8px">
+<p style="font-size:12px;font-weight:700;color:#0D3B6E;margin:0;font-family:'JetBrains Mono',monospace">Effective Carrier = Override || Matter Carrier || Client Default || UNASSIGNED</p>
+</div>
+<p style="font-size:11px;line-height:1.7;margin:0 0 6px">The system checks in this order:</p>
+<p style="font-size:11px;line-height:1.7;margin:0 0 4px"><b>1.</b> Did you manually <b>override</b> the matter? (Matters tab dropdown)</p>
+<p style="font-size:11px;line-height:1.7;margin:0 0 4px"><b>2.</b> Does the matter have a carrier from its <b>Billing Guidelines field</b> or claim number pattern?</p>
+<p style="font-size:11px;line-height:1.7;margin:0 0 4px"><b>3.</b> Does the client have a <b>default carrier</b>? (Clients tab dropdown)</p>
+<p style="font-size:11px;line-height:1.7;margin:0"><b>4.</b> If none of the above &rarr; shows as <span style="background:#ff6b6b;color:#fff;padding:1px 6px;border-radius:10px;font-size:10px;font-weight:700">UNASSIGNED</span></p>
+</div>
+</div>
+
+<div class="cd" style="margin-bottom:16px">
+<div style="padding:16px 20px">
+<h3 style="color:#0D3B6E;font-size:14px;margin:0 0 8px">Tips</h3>
+<p style="font-size:11px;line-height:1.8;margin:0 0 4px">&bull; Use the <b>search bars</b> and <b>filters</b> on each tab to find what you need quickly.</p>
+<p style="font-size:11px;line-height:1.8;margin:0 0 4px">&bull; The <b>Clients tab</b> sorts by assignment completion &mdash; fully assigned clients float to the top.</p>
+<p style="font-size:11px;line-height:1.8;margin:0 0 4px">&bull; Changes on the Clients tab <b>automatically update</b> the Matters tab (same formula).</p>
+<p style="font-size:11px;line-height:1.8;margin:0 0 4px">&bull; Your login session is <b>permanent</b> on this device &mdash; you won&rsquo;t need to sign in again.</p>
+<p style="font-size:11px;line-height:1.8;margin:0">&bull; If you have questions, contact <b>jason@advocatecloudsolutions.com</b>.</p>
+</div>
+</div>
+
+</div>
+</div>
+
 <div class="pn" id="p-profiles">
 <div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap"><button class="btn bp" onclick="xAll()">Expand All</button><button class="btn bo" onclick="cAll()">Collapse All</button><input type="text" id="pS" placeholder="Search profiles..." oninput="fP()" class="sr" style="width:220px"></div>
 <div class="cd pc" data-n="hanover">
