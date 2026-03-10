@@ -738,10 +738,10 @@ input[type=text]{padding:5px 8px;border:1px solid var(--g2);border-radius:6px;fo
 <div class="pn" id="p-clients">
 <div style="display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap">
 <input type="text" id="cS" placeholder="Search clients..." oninput="renderClients()" class="sr" style="width:260px">
-<select id="cF" onchange="renderClients()" class="sr"><option value="all">All</option><option value="ok">Has Default</option><option value="gap">Needs Default</option></select>
+<select id="cF" onchange="renderClients()" class="sr"><option value="all">All</option><option value="ok">All Assigned</option><option value="gap">Has Unassigned</option></select>
 <span id="cCt" style="font-size:10px;color:var(--g4)"></span>
 </div>
-<table><thead><tr><th>Client</th><th>#</th><th>Default Carrier</th><th>Effective Carrier (formula)</th></tr></thead><tbody id="cBody"></tbody></table></div>
+<table><thead><tr><th>Client</th><th>Status</th><th>Effective Carrier ⚡ (from formula)</th><th>Set Default Carrier</th></tr></thead><tbody id="cBody"></tbody></table></div>
 <div class="pn" id="p-matters">
 <div style="background:var(--sk);border:2px solid var(--bl);border-radius:var(--r);padding:8px 12px;margin-bottom:8px;font-size:11px">
 <b>Effective Carrier</b> = Matter Carrier <b>||</b> Client Default <b>||</b> UNASSIGNED &nbsp;— changes to Client Default auto-update all its matters</div>
@@ -805,29 +805,53 @@ function renderClients(){
     const q=(document.getElementById('cS')?.value||'').toLowerCase();
     const f=document.getElementById('cF')?.value||'all';
     let h='',shown=0;
-    for(const c of [...CL].sort((a,b)=>{const da=CD[a]||'',db=CD[b]||'';if(da&&!db)return-1;if(!da&&db)return 1;return a.localeCompare(b);})){
+    for(const c of [...CL].sort((a,b)=>{
+        // Sort by: how many unassigned matters (fewer = better = top)
+        const ua=M.filter((m,i)=>m.c===a&&!eff(i)).length;
+        const ub=M.filter((m,i)=>m.c===b&&!eff(i)).length;
+        const ta=M.filter(m=>m.c===a).length;
+        const tb=M.filter(m=>m.c===b).length;
+        const pa=ta?ua/ta:1, pb=tb?ub/tb:1;
+        if(pa!==pb)return pa-pb;
+        return a.localeCompare(b);
+    })){
         const def=CD[c]||'';
-        const mc=M.filter(m=>m.c===c).length;
-        // Effective carriers for this client
+        const matters=[];
         const effs={};
-        M.forEach((m,i)=>{if(m.c===c){const e=eff(i)||'UNASSIGNED';effs[e]=(effs[e]||0)+1;}});
+        M.forEach((m,i)=>{if(m.c===c){matters.push(i);const e=eff(i)||'UNASSIGNED';effs[e]=(effs[e]||0)+1;}});
+        const mc=matters.length;
+        const unassigned=effs['UNASSIGNED']||0;
+        const assigned=mc-unassigned;
         
-        if(q&&!c.toLowerCase().includes(q)&&!def.toLowerCase().includes(q))continue;
-        if(f==='ok'&&!def)continue;
-        if(f==='gap'&&def)continue;
+        // Effective carrier: the formula result for this client's matters
+        const carrierKeys=Object.keys(effs).filter(k=>k!=='UNASSIGNED');
+        const effectiveDisplay=carrierKeys.length===1?carrierKeys[0]:carrierKeys.length>1?'Mixed ('+carrierKeys.length+')':'UNASSIGNED';
+        
+        if(q&&!(c+' '+effectiveDisplay+' '+def).toLowerCase().includes(q))continue;
+        if(f==='ok'&&unassigned===mc)continue;
+        if(f==='gap'&&unassigned===0)continue;
         shown++;
         
-        const bg=def?'':'background:var(--rb)';
+        // Red only if ANY matters are unassigned
+        const bg=unassigned>0?'background:var(--rb)':'';
+        
+        // Effective carrier tags
         const tags=Object.entries(effs).sort((a,b)=>b[1]-a[1]).map(([k,v])=>
             `<span class="tg" style="background:${k==='UNASSIGNED'?'var(--co)':'var(--bl)'};color:#fff">${k} (${v})</span>`
         ).join(' ');
         
+        // Status
+        const status=unassigned===0?`<span style="color:var(--gn);font-weight:700">✓ ${assigned}/${mc}</span>`
+            :unassigned===mc?`<span style="color:var(--co);font-weight:700">✗ 0/${mc}</span>`
+            :`<span style="color:var(--or);font-weight:700">⚠ ${assigned}/${mc}</span>`;
+        
         const opts=CN.map(n=>`<option${n===def?' selected':''}>${n}</option>`).join('');
         const safe=c.replace(/[^a-zA-Z0-9]/g,'_').slice(0,30);
         
-        h+=`<tr style="${bg}"><td><b>${c}</b></td><td>${mc}</td>`;
+        h+=`<tr style="${bg}"><td><b>${c}</b></td><td>${status}</td>`;
+        h+=`<td>${tags}</td>`;
         h+=`<td><select id="cd_${safe}" data-client="${c.replace(/"/g,'&quot;')}" onchange="setCD(this)" class="sr" style="width:150px"><option value="">— Select —</option>${opts}</select></td>`;
-        h+=`<td>${tags}</td></tr>`;
+        h+=`</tr>`;
     }
     document.getElementById('cBody').innerHTML=h;
     document.getElementById('cCt').textContent=shown+' shown';
