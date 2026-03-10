@@ -28,35 +28,54 @@ input[type=text]{padding:5px 8px;border:1px solid var(--g2);border-radius:6px;fo
 </style></head><body>
 
 <div id="loginGate" style="position:fixed;inset:0;background:var(--nv);z-index:9999;display:flex;align-items:center;justify-content:center">
-<div style="background:#fff;border-radius:12px;padding:32px;max-width:360px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,.3);text-align:center">
+<div style="background:#fff;border-radius:12px;padding:32px;max-width:380px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,.3)">
+<div style="text-align:center;margin-bottom:20px">
 <div style="font-size:32px;margin-bottom:8px">🏢</div>
 <h2 style="color:var(--nv);margin-bottom:4px;font-size:18px">SDS Billing Profiles</h2>
-<p style="color:var(--g4);font-size:11px;margin-bottom:20px">Strikowsky Drachman & Shapiro</p>
-<div id="loginErr" style="display:none;color:var(--co);font-size:11px;margin-bottom:8px;font-weight:700">Incorrect password</div>
-<input type="password" id="loginPw" placeholder="Enter password" style="width:100%;padding:10px 14px;border:2px solid var(--g2);border-radius:8px;font-size:14px;font-family:inherit;margin-bottom:12px;text-align:center" onkeydown="if(event.key==='Enter')doLogin()">
-<button onclick="doLogin()" style="width:100%;padding:10px;background:var(--bl);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">Sign In</button>
-<p style="color:var(--g4);font-size:9px;margin-top:12px">Contact Jason Adams for access</p>
+<p style="color:var(--g4);font-size:11px">Strikowsky Drachman & Shapiro PLLC</p>
+</div>
+<div id="loginErr" style="display:none;color:var(--co);font-size:11px;margin-bottom:8px;font-weight:700;text-align:center">Invalid email or password</div>
+<label style="font-size:10px;font-weight:700;color:var(--nv);display:block;margin-bottom:4px">Email</label>
+<input type="email" id="loginEmail" placeholder="you@example.com" style="width:100%;padding:10px 14px;border:2px solid var(--g2);border-radius:8px;font-size:13px;font-family:inherit;margin-bottom:12px" onkeydown="if(event.key==='Enter')document.getElementById('loginPw').focus()">
+<label style="font-size:10px;font-weight:700;color:var(--nv);display:block;margin-bottom:4px">Password</label>
+<input type="password" id="loginPw" placeholder="Enter password" style="width:100%;padding:10px 14px;border:2px solid var(--g2);border-radius:8px;font-size:13px;font-family:inherit;margin-bottom:16px" onkeydown="if(event.key==='Enter')doLogin()">
+<button onclick="doLogin()" style="width:100%;padding:11px;background:var(--bl);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">Sign In</button>
+<p style="color:var(--g4);font-size:9px;margin-top:14px;text-align:center">Contact Jason Adams for access</p>
 </div></div>
 <script>
-const PW_HASH='5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8'; // sha256 of 'password'
-// CHANGE THIS: Set your password by replacing the hash above
-// To generate: echo -n 'yourpassword' | sha256sum
 const ACTUAL_PW='SDS2026!';
+let loggedUser='';
 function doLogin(){
-const v=document.getElementById('loginPw').value;
-if(v===ACTUAL_PW){
+const email=document.getElementById('loginEmail').value.trim();
+const pw=document.getElementById('loginPw').value;
+if(!email||!email.includes('@')){
+document.getElementById('loginErr').textContent='Please enter a valid email';
+document.getElementById('loginErr').style.display='block';
+document.getElementById('loginEmail').style.borderColor='var(--co)';
+setTimeout(()=>{document.getElementById('loginEmail').style.borderColor='var(--g2)';document.getElementById('loginErr').style.display='none';},2000);
+return;}
+if(pw===ACTUAL_PW){
+loggedUser=email;
 sessionStorage.setItem('sds_auth','1');
+sessionStorage.setItem('sds_user',email);
+sessionStorage.setItem('sds_login_time',new Date().toISOString());
 document.getElementById('loginGate').style.display='none';
+document.getElementById('userBadge').textContent=email;
+document.getElementById('userBadge').style.display='inline';
 }else{
+document.getElementById('loginErr').textContent='Invalid email or password';
 document.getElementById('loginErr').style.display='block';
 document.getElementById('loginPw').style.borderColor='var(--co)';
 setTimeout(()=>{document.getElementById('loginPw').style.borderColor='var(--g2)';document.getElementById('loginErr').style.display='none';},2000);
 }}
-if(sessionStorage.getItem('sds_auth')==='1')document.getElementById('loginGate').style.display='none';
-else document.getElementById('loginPw').focus();
+if(sessionStorage.getItem('sds_auth')==='1'){
+document.getElementById('loginGate').style.display='none';
+loggedUser=sessionStorage.getItem('sds_user')||'';
+setTimeout(()=>{const b=document.getElementById('userBadge');if(b&&loggedUser){b.textContent=loggedUser;b.style.display='inline';}},100);
+}else{setTimeout(()=>document.getElementById('loginEmail').focus(),100);}
 </script>
 
-<div class="hd"><h1>SDS Billing Profiles</h1>
+<div class="hd"><div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px"><h1>SDS Billing Profiles</h1><span id="userBadge" style="display:none;background:rgba(255,255,255,.2);padding:3px 10px;border-radius:12px;font-size:10px"></span></div>
 <p>23 profiles · 48 clients · 586 matters · 507 assigned · 79 unassigned · Carrier = matter.carrier || clientDefault[client] || UNASSIGNED</p></div>
 <div class="tabs">
 <div class="tb on" data-t="profiles">🏢 Profiles (23)</div>
@@ -1188,7 +1207,7 @@ function getList(pid,key){const l=document.getElementById(pid+'_'+key+'_list');i
 
 // Save
 function saveAll(){
-const d={profiles:{},clientDefaults:{},matterOverrides:{},matters:[]};
+const d={savedBy:loggedUser||sessionStorage.getItem('sds_user')||'unknown',savedAt:new Date().toISOString(),profiles:{},clientDefaults:{},matterOverrides:{},matters:[]};
 for(let i=0;i<PCOUNT;i++){const pid='p'+i;
 d.profiles[PROFILES[i]]={platform:document.getElementById(pid+'_plat')?.value||'',
 rateLock:document.getElementById(pid+'_rl')?.value||'',
