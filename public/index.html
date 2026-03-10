@@ -26,6 +26,36 @@ input[type=text]{padding:5px 8px;border:1px solid var(--g2);border-radius:6px;fo
 .save-bar{position:fixed;bottom:0;left:0;right:0;background:var(--nv);color:#fff;padding:8px 24px;display:flex;justify-content:space-between;align-items:center;z-index:200;box-shadow:0 -2px 12px rgba(0,0,0,.2)}
 @media(max-width:900px){.g3{grid-template-columns:1fr}.pn{padding:10px 12px}}
 </style></head><body>
+
+<div id="loginGate" style="position:fixed;inset:0;background:var(--nv);z-index:9999;display:flex;align-items:center;justify-content:center">
+<div style="background:#fff;border-radius:12px;padding:32px;max-width:360px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,.3);text-align:center">
+<div style="font-size:32px;margin-bottom:8px">🏢</div>
+<h2 style="color:var(--nv);margin-bottom:4px;font-size:18px">SDS Billing Profiles</h2>
+<p style="color:var(--g4);font-size:11px;margin-bottom:20px">Strikowsky Drachman & Shapiro</p>
+<div id="loginErr" style="display:none;color:var(--co);font-size:11px;margin-bottom:8px;font-weight:700">Incorrect password</div>
+<input type="password" id="loginPw" placeholder="Enter password" style="width:100%;padding:10px 14px;border:2px solid var(--g2);border-radius:8px;font-size:14px;font-family:inherit;margin-bottom:12px;text-align:center" onkeydown="if(event.key==='Enter')doLogin()">
+<button onclick="doLogin()" style="width:100%;padding:10px;background:var(--bl);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">Sign In</button>
+<p style="color:var(--g4);font-size:9px;margin-top:12px">Contact Jason Adams for access</p>
+</div></div>
+<script>
+const PW_HASH='5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8'; // sha256 of 'password'
+// CHANGE THIS: Set your password by replacing the hash above
+// To generate: echo -n 'yourpassword' | sha256sum
+const ACTUAL_PW='SDS2026!';
+function doLogin(){
+const v=document.getElementById('loginPw').value;
+if(v===ACTUAL_PW){
+sessionStorage.setItem('sds_auth','1');
+document.getElementById('loginGate').style.display='none';
+}else{
+document.getElementById('loginErr').style.display='block';
+document.getElementById('loginPw').style.borderColor='var(--co)';
+setTimeout(()=>{document.getElementById('loginPw').style.borderColor='var(--g2)';document.getElementById('loginErr').style.display='none';},2000);
+}}
+if(sessionStorage.getItem('sds_auth')==='1')document.getElementById('loginGate').style.display='none';
+else document.getElementById('loginPw').focus();
+</script>
+
 <div class="hd"><h1>SDS Billing Profiles</h1>
 <p>23 profiles · 48 clients · 586 matters · 507 assigned · 79 unassigned · Carrier = matter.carrier || clientDefault[client] || UNASSIGNED</p></div>
 <div class="tabs">
