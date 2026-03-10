@@ -84,17 +84,16 @@ setTimeout(()=>{const b=document.getElementById('userBadge');if(b&&loggedUser){b
 }else{setTimeout(()=>document.getElementById('loginEmail').focus(),100);}
 </script>
 
-<div class="hd" style="padding:16px 32px">
-<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+<div class="hd" style="padding:10px 24px;display:flex;align-items:center;justify-content:space-between">
+<div style="display:flex;align-items:center;gap:12px">
 <div>
-<h1 style="font-size:20px;letter-spacing:1px;margin:0">ADVOCATE CLOUD SOLUTIONS</h1>
-<p style="opacity:.5;font-size:10px;letter-spacing:2px;margin:2px 0 0">SUPERCHARGING LEGAL EFFICIENCY</p>
+<div style="font-size:13px;font-weight:700;letter-spacing:.5px">ADVOCATE CLOUD SOLUTIONS</div>
+<div style="font-size:8px;opacity:.5;letter-spacing:1.5px">SUPERCHARGING LEGAL EFFICIENCY</div>
 </div>
-<div style="text-align:right">
-<p style="font-size:14px;font-weight:700;margin:0">SDS Billing Profiles <span id="userBadge" style="display:none;background:rgba(255,255,255,.25);padding:3px 10px;border-radius:12px;font-size:10px;margin-left:6px"></span></p>
-<p style="opacity:.5;font-size:10px;margin:2px 0 0">23 profiles · 48 clients · 586 matters · 507 assigned · 79 unassigned</p>
+<div style="width:1px;height:24px;background:rgba(255,255,255,.2)"></div>
+<div style="font-size:12px;opacity:.8">SDS Billing Profiles</div>
 </div>
-</div>
+<span id="userBadge" style="display:none;background:rgba(255,255,255,.2);padding:3px 10px;border-radius:12px;font-size:10px"></span>
 </div>
 <div class="tabs">
 <div class="tb on" data-t="instructions">📋 Instructions</div>
