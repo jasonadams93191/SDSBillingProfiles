@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "name": "sds-billing-profiles",
+  "buildCommand": null,
+  "outputDirectory": ".",
+  "framework": null,
+  "routes": [
+    { "src": "/(.*)", "dest": "/$1" }
+  ]
+}

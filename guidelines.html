@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>SDS Billing Profile Guidelines</title>
+</head>
+<body>
+
+<h1>SDS Billing Profile Guidelines</h1>
+<p>
+  This document outlines the standards, policies, and procedures governing
+  Billing Profiles within the SDS platform. All team members and partners
+  must adhere to these guidelines when creating or modifying billing records.
+</p>
+
+<!-- ─────────────────────────────────────────────── -->
+<h2>1. Overview</h2>
+<p>
+  A <strong>Billing Profile</strong> is a named configuration that captures all
+  the information needed to generate an accurate invoice for a customer or
+  internal cost center. Profiles are used across SDS modules to ensure
+  consistent, auditable billing.
+</p>
+
+<h3>1.1 Scope</h3>
+<p>These guidelines apply to:</p>
+<ul>
+  <li>All customer-facing billing profiles</li>
+  <li>Internal cost-center charge-back profiles</li>
+  <li>Partner and reseller billing arrangements</li>
+</ul>
+
+<h3>1.2 Key Definitions</h3>
+<table>
+  <thead>
+    <tr>
+      <th>Term</th>
+      <th>Definition</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Billing Profile</td>
+      <td>A named set of billing parameters associated with an account or cost center.</td>
+    </tr>
+    <tr>
+      <td>Invoice Cycle</td>
+      <td>The periodic interval (monthly, quarterly, annual) at which invoices are generated.</td>
+    </tr>
+    <tr>
+      <td>Payment Term</td>
+      <td>The agreed period within which payment must be received after an invoice is issued (e.g., Net 30).</td>
+    </tr>
+    <tr>
+      <td>Tax Code</td>
+      <td>The jurisdiction-specific identifier used to calculate applicable taxes.</td>
+    </tr>
+    <tr>
+      <td>GL Account</td>
+      <td>The General Ledger account code to which revenue or cost is posted.</td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- ─────────────────────────────────────────────── -->
+<h2>2. Profile Creation Requirements</h2>
+<p>
+  Every billing profile <strong>must</strong> include the mandatory fields listed
+  below before it can be activated in the system.
+</p>
+
+<h3>2.1 Mandatory Fields</h3>
+<ul>
+  <li><strong>Profile Name</strong> – Unique, human-readable identifier (max 80 chars)</li>
+  <li><strong>Account ID</strong> – System-assigned customer or cost-center identifier</li>
+  <li><strong>Currency</strong> – ISO 4217 code (e.g., <code>USD</code>, <code>EUR</code>, <code>GBP</code>)</li>
+  <li><strong>Invoice Cycle</strong> – Monthly, Quarterly, or Annual</li>
+  <li><strong>Payment Term</strong> – Net 15, Net 30, Net 60, or custom</li>
+  <li><strong>Billing Contact Email</strong> – Must be a verified corporate address</li>
+  <li><strong>GL Account</strong> – Must exist in the active chart of accounts</li>
+</ul>
+
+<h3>2.2 Optional Fields</h3>
+<ul>
+  <li>Purchase Order (PO) Number</li>
+  <li>Tax Exemption Certificate</li>
+  <li>Secondary Billing Contact</li>
+  <li>Custom Invoice Notes (max 500 chars)</li>
+</ul>
+
+<!-- ─────────────────────────────────────────────── -->
+<h2>3. Approval Workflow</h2>
+<p>
+  Profile changes follow a two-stage approval process to maintain data integrity
+  and comply with financial controls.
+</p>
+
+<h3>3.1 Stage 1 – Submitter Review</h3>
+<ol>
+  <li>Submitter completes all mandatory fields.</li>
+  <li>System performs automated validation (format checks, GL account lookup).</li>
+  <li>Submitter clicks <strong>Submit for Approval</strong>.</li>
+</ol>
+
+<h3>3.2 Stage 2 – Finance Approval</h3>
+<ol>
+  <li>Finance team receives email notification.</li>
+  <li>Reviewer verifies tax codes, GL mapping, and payment terms.</li>
+  <li>Reviewer approves or rejects with comments within <strong>2 business days</strong>.</li>
+</ol>
+
+<blockquote>
+  ⚠️ <strong>Note:</strong> Profiles in <em>Pending Approval</em> status cannot be used
+  to generate invoices until fully approved.
+</blockquote>
+
+<!-- ─────────────────────────────────────────────── -->
+<h2>4. Naming Conventions</h2>
+<p>Profile names must follow the pattern below to ensure uniqueness and readability:</p>
+<pre><code>[Region]-[AccountType]-[AccountID]-[YYYY]
+Example: NA-ENT-100234-2025</code></pre>
+
+<table>
+  <thead>
+    <tr><th>Segment</th><th>Values</th><th>Example</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Region</td><td>NA, EMEA, APAC, LATAM</td><td>NA</td></tr>
+    <tr><td>AccountType</td><td>ENT (Enterprise), SMB, GOV, INT (Internal)</td><td>ENT</td></tr>
+    <tr><td>AccountID</td><td>6-digit numeric ID</td><td>100234</td></tr>
+    <tr><td>Year</td><td>4-digit calendar year of creation</td><td>2025</td></tr>
+  </tbody>
+</table>
+
+<!-- ─────────────────────────────────────────────── -->
+<h2>5. Tax &amp; Compliance</h2>
+
+<h3>5.1 Tax Code Assignment</h3>
+<p>
+  Tax codes are automatically suggested based on the account's billing address
+  jurisdiction. Reviewers must confirm or override suggestions when:
+</p>
+<ul>
+  <li>The customer holds a valid tax-exemption certificate.</li>
+  <li>The account crosses multiple tax jurisdictions.</li>
+  <li>The service category requires a special tax treatment.</li>
+</ul>
+
+<h3>5.2 Exemptions</h3>
+<p>
+  To apply a tax exemption, attach the certificate in PDF format (max 5 MB)
+  before submission. Exemptions expire on the certificate's stated date and
+  must be renewed by the billing contact.
+</p>
+
+<!-- ─────────────────────────────────────────────── -->
+<h2>6. Modification &amp; Archival Policy</h2>
+
+<h3>6.1 Allowed Modifications Post-Activation</h3>
+<p>
+  The following fields may be updated on an active profile without requiring
+  full re-approval:
+</p>
+<ul>
+  <li>Billing Contact Email</li>
+  <li>Secondary Billing Contact</li>
+  <li>Custom Invoice Notes</li>
+  <li>PO Number</li>
+</ul>
+<p>
+  Changes to <em>Currency</em>, <em>Invoice Cycle</em>, <em>Payment Term</em>,
+  or <em>GL Account</em> require a new approval cycle and take effect on the
+  next invoice date.
+</p>
+
+<h3>6.2 Archival</h3>
+<p>Profiles are automatically archived when:</p>
+<ul>
+  <li>The associated account is closed.</li>
+  <li>The profile has been inactive (no invoices generated) for <strong>12 consecutive months</strong>.</li>
+</ul>
+<p>
+  Archived profiles are retained for <strong>7 years</strong> for audit purposes
+  and cannot be reactivated without Finance approval.
+</p>
+
+<!-- ─────────────────────────────────────────────── -->
+<h2>7. Contact &amp; Support</h2>
+<p>For questions or issues related to billing profiles, contact:</p>
+<ul>
+  <li><strong>Finance Operations Team</strong> – <a href="mailto:finance-ops@sds.example.com">finance-ops@sds.example.com</a></li>
+  <li><strong>Internal Ticket System</strong> – <a href="#">Help Desk Portal</a></li>
+</ul>
+
+</body>
+</html>

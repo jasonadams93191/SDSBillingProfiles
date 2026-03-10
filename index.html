@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SDS Billing Profiles – Guidelines Viewer</title>
+  <style>
+    /* ── Reset & base ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: #f4f6f9;
+      color: #1a1a2e;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Header ── */
+    header {
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 60%, #0f3460 100%);
+      color: #fff;
+      padding: 1.25rem 2rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,.35);
+    }
+    header .logo {
+      font-size: 1.6rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: #e94560;
+    }
+    header .subtitle {
+      font-size: 0.9rem;
+      opacity: 0.75;
+      margin-top: 2px;
+    }
+
+    /* ── Toolbar ── */
+    .toolbar {
+      background: #fff;
+      border-bottom: 1px solid #e2e8f0;
+      padding: 0.75rem 2rem;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .toolbar label {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: #475569;
+    }
+    .toolbar select, .toolbar input[type="file"] {
+      font-size: 0.875rem;
+      padding: 0.4rem 0.75rem;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      background: #f8fafc;
+      cursor: pointer;
+      outline: none;
+      transition: border-color .2s;
+    }
+    .toolbar select:focus, .toolbar input[type="file"]:focus {
+      border-color: #0f3460;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.45rem 1rem;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .2s, transform .1s;
+    }
+    .btn:active { transform: scale(0.97); }
+    .btn-primary { background: #0f3460; color: #fff; }
+    .btn-primary:hover { background: #1a4a80; }
+    .btn-secondary { background: #e94560; color: #fff; }
+    .btn-secondary:hover { background: #c73552; }
+    .btn-outline { background: #fff; color: #0f3460; border: 1.5px solid #0f3460; }
+    .btn-outline:hover { background: #e8eef8; }
+
+    /* ── Main layout ── */
+    .main {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    /* ── Sidebar (table of contents) ── */
+    #sidebar {
+      width: 260px;
+      min-width: 180px;
+      background: #fff;
+      border-right: 1px solid #e2e8f0;
+      overflow-y: auto;
+      padding: 1rem 0;
+      transition: width .25s;
+    }
+    #sidebar h3 {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #94a3b8;
+      padding: 0 1rem 0.5rem;
+      font-weight: 700;
+    }
+    #toc-list { list-style: none; }
+    #toc-list li a {
+      display: block;
+      padding: 0.45rem 1rem;
+      font-size: 0.83rem;
+      color: #334155;
+      text-decoration: none;
+      border-left: 3px solid transparent;
+      transition: background .15s, border-color .15s;
+    }
+    #toc-list li a:hover { background: #f1f5f9; border-left-color: #0f3460; }
+    #toc-list li a.active { background: #eff6ff; border-left-color: #e94560; color: #0f3460; font-weight: 700; }
+    #toc-list li.level-2 a { padding-left: 1.75rem; }
+    #toc-list li.level-3 a { padding-left: 2.5rem; font-size: 0.78rem; }
+
+    /* ── Viewer pane ── */
+    #viewer-wrapper {
+      flex: 1;
+      overflow: auto;
+      padding: 2rem;
+    }
+
+    /* ── Welcome / empty state ── */
+    #welcome {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      text-align: center;
+      gap: 1rem;
+      color: #64748b;
+    }
+    #welcome .icon { font-size: 4rem; }
+    #welcome h2 { font-size: 1.4rem; color: #1e293b; }
+    #welcome p { max-width: 420px; line-height: 1.6; }
+
+    /* ── Rendered HTML frame ── */
+    #html-frame {
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 2px 12px rgba(0,0,0,.08);
+      padding: 2.5rem 3rem;
+      max-width: 900px;
+      margin: 0 auto;
+      /* Render inner HTML safely but styled */
+      line-height: 1.75;
+      font-size: 1rem;
+      color: #1e293b;
+    }
+    #html-frame h1, #html-frame h2, #html-frame h3,
+    #html-frame h4, #html-frame h5, #html-frame h6 {
+      margin: 1.5rem 0 0.5rem;
+      line-height: 1.3;
+      color: #0f3460;
+    }
+    #html-frame h1 { font-size: 2rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.5rem; }
+    #html-frame h2 { font-size: 1.5rem; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.35rem; }
+    #html-frame h3 { font-size: 1.2rem; }
+    #html-frame p  { margin: 0.75rem 0; }
+    #html-frame ul, #html-frame ol { margin: 0.75rem 0 0.75rem 1.5rem; }
+    #html-frame li { margin: 0.3rem 0; }
+    #html-frame table {
+      width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.9rem;
+    }
+    #html-frame th, #html-frame td {
+      border: 1px solid #e2e8f0; padding: 0.6rem 0.9rem; text-align: left;
+    }
+    #html-frame th { background: #f1f5f9; font-weight: 700; color: #0f3460; }
+    #html-frame tr:nth-child(even) td { background: #f8fafc; }
+    #html-frame blockquote {
+      border-left: 4px solid #e94560; padding: 0.5rem 1rem;
+      background: #fff5f7; margin: 1rem 0; border-radius: 0 6px 6px 0;
+    }
+    #html-frame code {
+      background: #f1f5f9; padding: 0.15rem 0.4rem;
+      border-radius: 4px; font-size: 0.85em; font-family: "Fira Code", monospace;
+    }
+    #html-frame pre {
+      background: #1e293b; color: #e2e8f0; padding: 1rem 1.25rem;
+      border-radius: 8px; overflow-x: auto; margin: 1rem 0;
+    }
+    #html-frame pre code { background: none; color: inherit; padding: 0; }
+    #html-frame a { color: #0f3460; }
+    #html-frame img { max-width: 100%; border-radius: 6px; }
+    #html-frame .highlight, #html-frame mark { background: #fef9c3; padding: 0 3px; border-radius: 3px; }
+
+    /* ── Status bar ── */
+    #status-bar {
+      background: #1e293b;
+      color: #94a3b8;
+      font-size: 0.75rem;
+      padding: 0.35rem 2rem;
+      display: flex;
+      gap: 1.5rem;
+    }
+    #status-bar span { display: flex; align-items: center; gap: 0.3rem; }
+
+    /* ── Print ── */
+    @media print {
+      header, .toolbar, #sidebar, #status-bar { display: none; }
+      #html-frame { box-shadow: none; padding: 0; max-width: 100%; }
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 640px) {
+      #sidebar { display: none; }
+      #viewer-wrapper { padding: 1rem; }
+      #html-frame { padding: 1.25rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════
+     HEADER
+═══════════════════════════════════════════════════════════ -->
+<header>
+  <div>
+    <div class="logo">SDS Billing Profiles</div>
+    <div class="subtitle">Guidelines Visualization Tool</div>
+  </div>
+</header>
+
+<!-- ═══════════════════════════════════════════════════════════
+     TOOLBAR
+═══════════════════════════════════════════════════════════ -->
+<div class="toolbar">
+  <label for="doc-select">Load document:</label>
+  <select id="doc-select" onchange="loadPreset(this.value)">
+    <option value="">— Choose a guideline —</option>
+    <option value="guidelines.html">SDS Billing Profile Guidelines</option>
+  </select>
+
+  <span style="color:#cbd5e1">│</span>
+
+  <label for="file-input">Upload HTML:</label>
+  <input type="file" id="file-input" accept=".html,.htm" onchange="loadFile(this)" />
+
+  <span style="color:#cbd5e1">│</span>
+
+  <button class="btn btn-outline" onclick="printDoc()">🖨 Print</button>
+  <button class="btn btn-secondary" onclick="clearDoc()">✕ Clear</button>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     MAIN
+═══════════════════════════════════════════════════════════ -->
+<div class="main">
+  <!-- Sidebar / TOC -->
+  <aside id="sidebar">
+    <h3>Contents</h3>
+    <ul id="toc-list">
+      <li><a href="#" style="color:#94a3b8;cursor:default;font-style:italic">No document loaded</a></li>
+    </ul>
+  </aside>
+
+  <!-- Viewer -->
+  <div id="viewer-wrapper">
+    <!-- Welcome state -->
+    <div id="welcome">
+      <div class="icon">📄</div>
+      <h2>SDS Billing Profile Guidelines Viewer</h2>
+      <p>
+        Select a guideline from the dropdown above, or upload your own
+        <strong>.html</strong> file to visualize it here.
+      </p>
+      <button class="btn btn-primary" onclick="loadPreset('guidelines.html')">
+        📋 Load Billing Guidelines
+      </button>
+    </div>
+
+    <!-- Rendered content -->
+    <div id="html-frame" style="display:none"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     STATUS BAR
+═══════════════════════════════════════════════════════════ -->
+<div id="status-bar">
+  <span id="status-doc">📄 No document loaded</span>
+  <span id="status-sections">Sections: 0</span>
+  <span id="status-words">Words: 0</span>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     SCRIPT
+═══════════════════════════════════════════════════════════ -->
+<script>
+  const frame    = document.getElementById('html-frame');
+  const welcome  = document.getElementById('welcome');
+  const tocList  = document.getElementById('toc-list');
+
+  /* ── Load a preset document from the server ── */
+  function loadPreset(url) {
+    if (!url) return;
+    fetch(url)
+      .then(r => {
+        if (!r.ok) throw new Error(`HTTP ${r.status} ${r.statusText}`);
+        return r.text();
+      })
+      .then(html => renderDocument(html, url))
+      .catch(err => {
+        const isFileProtocol = location.protocol === 'file:';
+        const hint = isFileProtocol
+          ? '\n\nTo load documents from the dropdown, serve this folder with a local HTTP server:\n  npx serve .\n  python -m http.server 8080'
+          : '';
+        alert(`Could not load "${url}".\n\n${err}${hint}`);
+      });
+  }
+
+  /* ── Load a file uploaded by the user ── */
+  function loadFile(input) {
+    const file = input.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = e => renderDocument(e.target.result, file.name);
+    reader.readAsText(file);
+  }
+
+  /* ── Render HTML into the frame ── */
+  function renderDocument(rawHtml, label) {
+    // Extract <body> content if present
+    const bodyMatch = rawHtml.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
+    const content   = bodyMatch ? bodyMatch[1] : rawHtml;
+
+    frame.innerHTML = content;
+    welcome.style.display  = 'none';
+    frame.style.display    = 'block';
+
+    buildTOC();
+    updateStatus(label, content);
+
+    // Scroll to top
+    document.getElementById('viewer-wrapper').scrollTop = 0;
+  }
+
+  /* ── Build table of contents from headings ── */
+  function buildTOC() {
+    const headings = frame.querySelectorAll('h1, h2, h3, h4, h5, h6');
+    tocList.innerHTML = '';
+
+    if (headings.length === 0) {
+      tocList.innerHTML = '<li><a style="color:#94a3b8;cursor:default;font-style:italic">No headings found</a></li>';
+      return;
+    }
+
+    headings.forEach((el, i) => {
+      const id = `section-${i}`;
+      el.id = id;
+
+      const li  = document.createElement('li');
+      const lvl = parseInt(el.tagName[1]);
+      if (lvl >= 2) li.classList.add(`level-${Math.min(lvl, 3)}`);
+
+      const a   = document.createElement('a');
+      a.href    = `#${id}`;
+      a.textContent = el.textContent;
+      a.onclick = function(e) {
+        e.preventDefault();
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        tocList.querySelectorAll('a').forEach(x => x.classList.remove('active'));
+        a.classList.add('active');
+      };
+
+      li.appendChild(a);
+      tocList.appendChild(li);
+    });
+  }
+
+  /* ── Update status bar ── */
+  function updateStatus(label, html) {
+    const tmp   = document.createElement('div');
+    tmp.innerHTML = html;
+    const text  = tmp.textContent || '';
+    const words = text.trim().split(/\s+/).filter(Boolean).length;
+    const secs  = frame.querySelectorAll('h1, h2, h3').length;
+
+    document.getElementById('status-doc').textContent      = `📄 ${label}`;
+    document.getElementById('status-sections').textContent = `Sections: ${secs}`;
+    document.getElementById('status-words').textContent    = `Words: ${words.toLocaleString()}`;
+  }
+
+  /* ── Print ── */
+  function printDoc() { window.print(); }
+
+  /* ── Clear ── */
+  function clearDoc() {
+    frame.innerHTML       = '';
+    frame.style.display   = 'none';
+    welcome.style.display = 'flex';
+    tocList.innerHTML     = '<li><a style="color:#94a3b8;cursor:default;font-style:italic">No document loaded</a></li>';
+    document.getElementById('status-doc').textContent      = '📄 No document loaded';
+    document.getElementById('status-sections').textContent = 'Sections: 0';
+    document.getElementById('status-words').textContent    = 'Words: 0';
+    document.getElementById('doc-select').value = '';
+    document.getElementById('file-input').value = '';
+  }
+</script>
+</body>
+</html>
