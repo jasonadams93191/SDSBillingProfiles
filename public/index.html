@@ -1307,8 +1307,8 @@ function rmItem(btn){const li=btn.closest('.li');const list=li.parentElement;con
 function updateCt(pid,key){const l=document.getElementById(pid+'_'+key+'_list');const c=document.getElementById(pid+'_'+key+'_ct');if(c)c.textContent='('+l.children.length+')';}
 function getList(pid,key){const l=document.getElementById(pid+'_'+key+'_list');if(!l)return[];return[...l.querySelectorAll('input')].map(i=>i.value.trim()).filter(Boolean);}
 
-// Save
-function saveAll(){
+// Save — persists to Neon Postgres via /api/save
+function gatherData(){
 const d={savedBy:loggedUser||localStorage.getItem('sds_user')||'unknown',savedAt:new Date().toISOString(),profiles:{},clientDefaults:{},matterOverrides:{},matters:[]};
 for(let i=0;i<PCOUNT;i++){const pid='p'+i;
 d.profiles[PROFILES[i]]={platform:document.getElementById(pid+'_plat')?.value||'',
@@ -1316,12 +1316,62 @@ rateLock:document.getElementById(pid+'_rl')?.value||'',
 rates:{partner:document.getElementById(pid+'_partner')?.value||'',associate:document.getElementById(pid+'_associate')?.value||'',paralegal:document.getElementById(pid+'_paralegal')?.value||''},
 banned:getList(pid,'banned'),narrative:getList(pid,'narrative'),travel:getList(pid,'travel'),
 nonbillable:getList(pid,'nonbillable'),invoice:getList(pid,'invoice'),
-vendor:document.getElementById(pid+'_vendor')?.value||''};}
+vendor:document.getElementById(pid+'_vendor')?.value||''};};
 for(const c of CL){if(CD[c])d.clientDefaults[c]=CD[c];}
 for(const[i,v]of Object.entries(MO)){d.matterOverrides[M[i].id]={client:M[i].c,carrier:v};}
 d.matters=M.map((m,i)=>({...m,effective:eff(i)||'UNASSIGNED',source:effSrc(i)}));
-const j=JSON.stringify(d,null,2);try{localStorage.setItem('sds_saved_data',j);}catch(e){}
-dirty=false;document.getElementById('saveStatus').textContent='✅ Saved!';document.getElementById('saveStatus').style.color='var(--gn)';var sb=document.getElementById('saveBtn');if(sb){sb.style.opacity='.4';sb.style.pointerEvents='none';}}
+return d;}
+
+async function saveAll(){
+const sb=document.getElementById('saveBtn');const st=document.getElementById('saveStatus');
+st.textContent='💾 Saving...';st.style.color='#fff';
+if(sb){sb.style.opacity='.4';sb.style.pointerEvents='none';}
+const d=gatherData();
+try{
+const resp=await fetch('/api/save',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(d)});
+if(!resp.ok)throw new Error('Server returned '+resp.status);
+dirty=false;st.textContent='✅ Saved!';st.style.color='var(--gn)';
+}catch(e){
+console.error('Save failed:',e);
+st.textContent='❌ Save failed!';st.style.color='var(--co)';
+try{localStorage.setItem('sds_saved_data',JSON.stringify(d));}catch(le){}
+if(sb){sb.style.opacity='1';sb.style.pointerEvents='auto';}
+}}
+
+// Load saved data from Neon DB on page load
+async function loadAll(){
+try{
+const resp=await fetch('/api/load');
+if(!resp.ok)throw new Error('Server returned '+resp.status);
+const result=await resp.json();
+if(!result.data)return;
+restoreData(result.data);
+}catch(e){
+console.error('Load from DB failed, trying localStorage:',e);
+try{const j=localStorage.getItem('sds_saved_data');if(j)restoreData(JSON.parse(j));}catch(le){}
+}}
+
+function restoreData(d){
+if(!d)return;
+if(d.profiles){for(let i=0;i<PCOUNT;i++){const pid='p'+i;const p=d.profiles[PROFILES[i]];if(!p)continue;
+const plat=document.getElementById(pid+'_plat');if(plat&&p.platform)plat.value=p.platform;
+const rl=document.getElementById(pid+'_rl');if(rl&&p.rateLock)rl.value=p.rateLock;
+if(p.rates){const pr=document.getElementById(pid+'_partner');if(pr)pr.value=p.rates.partner||'';
+const ar=document.getElementById(pid+'_associate');if(ar)ar.value=p.rates.associate||'';
+const pl=document.getElementById(pid+'_paralegal');if(pl)pl.value=p.rates.paralegal||'';}
+const vn=document.getElementById(pid+'_vendor');if(vn&&p.vendor)vn.value=p.vendor;
+['banned','narrative','travel','nonbillable','invoice'].forEach(key=>{
+const list=document.getElementById(pid+'_'+key+'_list');
+if(!list||!p[key]||!p[key].length)return;
+list.innerHTML='';
+p[key].forEach(val=>{const div=document.createElement('div');div.className='li';
+div.innerHTML='<input type="text" value="'+val.replace(/"/g,'&quot;')+'" onchange="markDirty()"><button class="x" onclick="rmItem(this)">×</button>';
+list.appendChild(div);});
+updateCt(pid,key);});}}
+if(d.clientDefaults){for(const[c,v]of Object.entries(d.clientDefaults)){CD[c]=v;}}
+if(d.matterOverrides){for(const[mid,info]of Object.entries(d.matterOverrides)){
+const idx=M.findIndex(m=>m.id===mid);if(idx>=0)MO[idx]=info.carrier;}}
+renderC();renderM();loadAll();}
 
 
 window.onbeforeunload=()=>dirty?'Unsaved changes':null;
