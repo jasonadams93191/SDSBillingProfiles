@@ -13,11 +13,12 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Invalid data' });
     }
 
+    const jsonStr = JSON.stringify(data);
     await sql`
       INSERT INTO billing_data (id, data, saved_by, saved_at)
-      VALUES (1, ${JSON.stringify(data)}, ${data.savedBy}, NOW())
+      VALUES (1, ${jsonStr}::jsonb, ${data.savedBy}, NOW())
       ON CONFLICT (id) DO UPDATE SET
-        data = ${JSON.stringify(data)},
+        data = ${jsonStr}::jsonb,
         saved_by = ${data.savedBy},
         saved_at = NOW()
     `;
